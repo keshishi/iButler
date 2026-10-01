@@ -25,11 +25,11 @@ public class SlashCommandController extends BaseController<ChatInputInteractionE
         // Convert our list to a flux that we can iterate through
         return Flux.fromIterable(handlers)
                 // Filter out all commands that don't match the name this event is for
-                .filter(command -> command.getName().equals(event.getCommandName()))
+                .filter(handler -> handler.apply(event))
                 .collectList()
                 .flatMap(c -> c.size() > 1 ? Mono.error(new InternalError("We have defined two slash commands with the same name! " + c)) : Mono.just(c))
                 .flatMapMany(Flux::fromIterable)
                 // Have our command class handle all logic related to its specific command.
-                .flatMap(command -> command.handle(event));
+                .flatMap(handler -> handler.handle(event));
     }
 }

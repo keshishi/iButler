@@ -25,6 +25,11 @@ public class LogCommandHandler implements Handler<ChatInputInteractionEvent> {
     }
 
     @Override
+    public boolean apply(ChatInputInteractionEvent event) {
+        return event.getCommandName().equals(getName());
+    }
+
+    @Override
     public String getName() {
         return "log";
     }

@@ -11,16 +11,22 @@ import reactor.core.publisher.Mono;
 public class PingCommandHandler implements Handler<ChatInputInteractionEvent> {
 
     @Override
+    public boolean apply(ChatInputInteractionEvent event) {
+        return event.getCommandName().equals(getName());
+    }
+
+    @Override
     public String getName() {
         return "ping";
     }
 
     @Override
     public Mono<Void> handle(ChatInputInteractionEvent event) {
-        long start = event.getInteraction().getId().getTimestamp().getEpochSecond() * 1000 + event.getInteraction().getId().getTimestamp().getNano() / 1000_000;
-        event.deferReply().withEphemeral(true).subscribe();
+        final long start = event.getInteraction().getId().getTimestamp().getEpochSecond() * 1000 + event.getInteraction().getId().getTimestamp().getNano() / 1000_000;
 
         //Reply to the slash command, with the name the user supplied
-        return event.editReply("Pong! Response took " + (System.currentTimeMillis() - start) + "ms").then();
+        return event.deferReply().withEphemeral(true)
+                .then(event.editReply("Pong! Response took " + (System.currentTimeMillis() - start) + "ms"))
+                .then();
     }
 }
